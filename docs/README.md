@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/geospatial-jeff/cognition-datasources-cbers.svg?style=svg)](https://circleci.com/gh/geospatial-jeff/cognition-datasources-cbers)
+
 ## CBERS
 
 | Parameter | Status |
