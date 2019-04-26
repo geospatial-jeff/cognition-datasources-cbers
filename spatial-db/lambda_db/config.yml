@@ -1,0 +1,7 @@
+db_name: 'cbers-coverage'
+config:
+  min_res: 3
+  max_res: 8
+  limit: 500
+  unique_id: 'id'
+  compress: true

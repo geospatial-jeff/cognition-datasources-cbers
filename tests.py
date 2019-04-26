@@ -9,52 +9,37 @@ class CBERSTestCases(tests.BaseTestCases):
 
         self.datasource = CBERS
         self.spatial = {
-                        "type": "Polygon",
-                        "coordinates": [
-                          [
-                            [
-                              -64.951171875,
-                              -7.520426889868663
-                            ],
-                            [
-                              -64.5172119140625,
-                              -7.520426889868663
-                            ],
-                            [
-                              -64.5172119140625,
-                              -7.144498849647323
-                            ],
-                            [
-                              -64.951171875,
-                              -7.144498849647323
-                            ],
-                            [
-                              -64.951171875,
-                              -7.520426889868663
-                            ]
-                          ]
-                        ]
-                      }
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -102.74414062499999,
+              47.18971246448421
+            ],
+            [
+              -102.23876953125,
+              47.18971246448421
+            ],
+            [
+              -102.23876953125,
+              47.517200697839414
+            ],
+            [
+              -102.74414062499999,
+              47.517200697839414
+            ],
+            [
+              -102.74414062499999,
+              47.18971246448421
+            ]
+          ]
+        ]
+      }
         self.temporal = ("2016-01-01", "2016-12-31")
         self.properties = {'eo:instrument': {'eq': 'PAN10M'}}
-        self.limit = 20
+        self.limit = 1
+        self.spatial_mode = 'extent'
 
-    def test_spatial_search(self):
-        # Overwriting default spatial test (testing with item bbox rather than item geometry)
-        self.manifest.flush()
-        self.manifest['CBERS'].search(self.spatial)
-        response = self.manifest.execute()
-        self.assertEqual(list(response), ['CBERS'])
-
-        # Confirming that each output feature intersects the input
-        for feat in response['CBERS']['features']:
-            asset_geom = Polygon([[feat['bbox'][0], feat['bbox'][3]],
-                                  [feat['bbox'][2], feat['bbox'][3]],
-                                  [feat['bbox'][2], feat['bbox'][1]],
-                                  [feat['bbox'][0], feat['bbox'][1]],
-                                  [feat['bbox'][0], feat['bbox'][3]]])
-
-            self.assertEqual(asset_geom.intersects(self.spatial_geom), True)
 
     def test_limit(self):
         # Overwriting default limit test

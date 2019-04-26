@@ -280,14 +280,18 @@ class CBERS(Datasource):
 
 
     def search(self, spatial, temporal=None, properties=None, limit=10, **kwargs):
-        stac_query = STACQuery(spatial, temporal, properties)
-        path_rows = stac_query.check_spatial(self.__class__.__name__)[:limit]
+        from db import Database
 
+        stac_query = STACQuery(spatial, temporal, properties)
+
+        with Database.load(read_only=True, deployed=True) as db:
+            path_rows = db.spatial_query({"type": "Feature", "geometry": stac_query.spatial})
+
+        searches = 0
         for candidate in path_rows:
             query_body = {
-                'path': candidate['path'],
-                'row': candidate['row'],
-                'geometry': json.loads(candidate['geom']),
+                'path': candidate['PATH'],
+                'row': candidate['ROW'],
             }
 
             if temporal:
@@ -298,14 +302,16 @@ class CBERS(Datasource):
                 if "eo:instrument" in list(properties):
                     query_body.update({"sensor": properties["eo:instrument"]})
 
-            self.manifest.searches.append([self, query_body])
+            if searches < limit:
+                self.manifest.searches.append([self, query_body])
+                searches+=1
 
     def execute(self, query):
         valid_list = []
         sensor = query['sensor']['eq'] if 'sensor' in list(query) else 'MUX'
         cbers_meta = cbers(query['path'], query['row'], sensor)
-        for idx, item in enumerate(cbers_meta):
 
+        for idx, item in enumerate(cbers_meta):
             approx_acquisition_date = f"{item['acquisition_date'][0:4]}-{item['acquisition_date'][4:6]}-{item['acquisition_date'][6:8]}"
 
             if "temporal" in list(query):
