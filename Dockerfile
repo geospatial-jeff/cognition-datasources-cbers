@@ -1,4 +1,4 @@
-FROM geospatialjeff/cognition-datasources-db:latest
+FROM geospatialjeff/cognition-datasources:latest
 
 COPY requirements*.txt ./
 
