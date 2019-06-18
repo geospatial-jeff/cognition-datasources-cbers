@@ -1,5 +1,4 @@
 from datasources import tests
-from shapely.geometry import Polygon
 
 from CBERS import CBERS
 
@@ -36,13 +35,16 @@ class CBERSTestCases(tests.BaseTestCases):
         ]
       }
         self.temporal = ("2016-01-01", "2016-12-31")
-        self.properties = {'eo:instrument': {'eq': 'PAN10M'}}
-        self.limit = 1
+        self.properties = {'eo:sun_azimuth': {'gt': '169'}}
+        self.limit = 5
         self.spatial_mode = 'extent'
 
 
-    def test_limit(self):
-        # Overwriting default limit test
-        # Limit doesn't work with structure of underlying API
-        pass
+    def test_subdatasets(self):
+        self.manifest.flush()
+        self.manifest[self.name].search(self.spatial, properties=self.properties, subdatasets=['mux'])
+        response = self.manifest.execute()
+
+        for feat in response[self.name]['features']:
+            self.assertTrue(self.check_properties(feat['properties']['collection'], 'cbers-mux'))
 
